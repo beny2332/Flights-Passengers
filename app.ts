@@ -46,35 +46,46 @@ const getFlights = async (): Promise <void> => {
 
 const getPasengers = async ():Promise <void> => {
     try {
-        const res: Response = await fetch(BASE_URL + 'pasangers')
-        const pasangers: fetchedPassenger[] = await res.json()
+        const [pasangersRes, flightsRes] = await Promise.all([
+            fetch(BASE_URL + 'pasangers'),
+            fetch(BASE_URL + 'flights')
+        ])
+        
+        const pasangers: fetchedPassenger[] = await pasangersRes.json()
+        const flights: flight[] = await flightsRes.json()
+
+        const flightMap = new Map(flights.map(flight => [flight.id, flight]))
+
         pasangersSection.innerHTML = ''
         for (const pasanger of pasangers) {
             if (pasanger.agent === AGENT_CODE){
             const psngDiv: HTMLDivElement = document.createElement('div')
             psngDiv.className = 'psng-div'
             const psngDetails: HTMLParagraphElement = document.createElement('p')
-            const psngFlight: flight = flightByid(pasanger.flight_id, flightsList)
-            if (psngFlight) {
-                const formattedDate = dateFormatter.format(new Date(psngFlight.date))
-                psngDetails.textContent = `${pasanger.name} - ${psngFlight.from}  ✈︎  ${psngFlight.to} |  Date: ${formattedDate}`
+
+            const flight = flightMap.get(pasanger.flight_id)
+            if (flight) {
+                const formattedDate = dateFormatter.format(new Date(flight.date))
+                psngDetails.textContent = `${pasanger.name} - ${flight.from}  ✈︎  ${flight.to} |  Date: ${formattedDate}`
                 
+            } else {
+                psngDetails.textContent = `${pasanger.name} - Flight details not available`;
             }
-            // else {throw (Error + 'Couldent find flight')}
+
             const editBtn: HTMLButtonElement = document.createElement('button')
             editBtn.textContent = 'Edit'
             editBtn.className = 'edit-btn'
-            editBtn.setAttribute('data-id', pasanger.id)
             psngDiv.appendChild(editBtn)
+
             const deleteBtn: HTMLButtonElement = document.createElement('button')
             deleteBtn.textContent = 'Delete'
             deleteBtn.className = 'delete-btn'
-            // deleteBtn.addEventListener('click', () => deletePassenger(pasanger.id))
-            deleteBtn.setAttribute('data-id', pasanger.id)
+            deleteBtn.addEventListener('click', () => deletePassenger(pasanger))
+            
             psngDiv.appendChild(deleteBtn)
             psngDiv.appendChild(psngDetails)
-            pasangersList.push(pasanger)
             pasangersSection.appendChild(psngDiv)
+            pasangersList.push(pasanger)
         }
     }
         
