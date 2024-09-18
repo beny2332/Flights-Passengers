@@ -11,11 +11,9 @@ const editBtn: HTMLButtonElement = document.querySelector('.editBtn')!
 
 const AGENT_CODE:string = "1234543"
 
-let flightsList: flight[] = []
-let pasangersList: fetchedPassenger[] = []
-const flightByid = (flight_id: string, flightsList: flight[]): flight => {
-    return flightsList.find(({id}) => id === flight_id)!
-}
+// let flightsList: flight[] = []
+// let pasangersList: fetchedPassenger[] = []
+
 
 const dateFormatter = new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
@@ -36,7 +34,6 @@ const getFlights = async (): Promise <void> => {
             const formattedDate = dateFormatter.format(new Date(flight.date))
             opt.textContent = `${flight.from}    ✈︎   ${flight.to} |  Date: ${formattedDate} `
             selectElm.appendChild(opt)
-            flightsList.push(flight)
         }
         
     } catch (error) {
@@ -75,17 +72,16 @@ const getPasengers = async ():Promise <void> => {
             const editBtn: HTMLButtonElement = document.createElement('button')
             editBtn.textContent = 'Edit'
             editBtn.className = 'edit-btn'
-            psngDiv.appendChild(editBtn)
-
+            
             const deleteBtn: HTMLButtonElement = document.createElement('button')
             deleteBtn.textContent = 'Delete'
             deleteBtn.className = 'delete-btn'
             deleteBtn.addEventListener('click', () => deletePassenger(pasanger))
             
-            psngDiv.appendChild(deleteBtn)
             psngDiv.appendChild(psngDetails)
+            psngDiv.appendChild(deleteBtn)
+            psngDiv.appendChild(editBtn)
             pasangersSection.appendChild(psngDiv)
-            pasangersList.push(pasanger)
         }
     }
         
@@ -136,7 +132,7 @@ const deletePassenger = async (pasanger: fetchedPassenger): Promise<void> => {
             throw new Error("Failed to delete passenger");
         }
 
-        console.log(`Passenger with ID ${pasanger.id} deleted successfully`);
+        console.log(`Passenger: ${pasanger.name} was deleted successfully`);
         
         await getPasengers()
     } catch (error) {
@@ -194,5 +190,4 @@ enum Resources {
         PASANGERS = 'pasangers'
 }
 
-console.log(flightsList);
 

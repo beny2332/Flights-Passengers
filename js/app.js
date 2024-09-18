@@ -10,11 +10,8 @@ const femaleRadio = document.querySelector("#f");
 const sendBtn = document.querySelector('#sendBtn');
 const editBtn = document.querySelector('.editBtn');
 const AGENT_CODE = "1234543";
-let flightsList = [];
-let pasangersList = [];
-const flightByid = (flight_id, flightsList) => {
-    return flightsList.find(({ id }) => id === flight_id);
-};
+// let flightsList: flight[] = []
+// let pasangersList: fetchedPassenger[] = []
 const dateFormatter = new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'short',
@@ -32,7 +29,6 @@ const getFlights = async () => {
             const formattedDate = dateFormatter.format(new Date(flight.date));
             opt.textContent = `${flight.from}    ✈︎   ${flight.to} |  Date: ${formattedDate} `;
             selectElm.appendChild(opt);
-            flightsList.push(flight);
         }
     }
     catch (error) {
@@ -65,15 +61,14 @@ const getPasengers = async () => {
                 const editBtn = document.createElement('button');
                 editBtn.textContent = 'Edit';
                 editBtn.className = 'edit-btn';
-                psngDiv.appendChild(editBtn);
                 const deleteBtn = document.createElement('button');
                 deleteBtn.textContent = 'Delete';
                 deleteBtn.className = 'delete-btn';
                 deleteBtn.addEventListener('click', () => deletePassenger(pasanger));
-                psngDiv.appendChild(deleteBtn);
                 psngDiv.appendChild(psngDetails);
+                psngDiv.appendChild(deleteBtn);
+                psngDiv.appendChild(editBtn);
                 pasangersSection.appendChild(psngDiv);
-                pasangersList.push(pasanger);
             }
         }
     }
@@ -118,7 +113,7 @@ const deletePassenger = async (pasanger) => {
         if (!res.ok) {
             throw new Error("Failed to delete passenger");
         }
-        console.log(`Passenger with ID ${pasanger.id} deleted successfully`);
+        console.log(`Passenger: ${pasanger.name} was deleted successfully`);
         await getPasengers();
     }
     catch (error) {
@@ -146,4 +141,3 @@ var Resources;
     Resources["FLIGHTS"] = "flights";
     Resources["PASANGERS"] = "pasangers";
 })(Resources || (Resources = {}));
-console.log(flightsList);
